@@ -1,12 +1,13 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { getLatestRelease } from '@/lib/releases';
 
 export const dynamic = 'force-dynamic';
 
-const PLATFORM_MAP: Record<
-  string,
-  keyof Awaited<ReturnType<typeof getLatestRelease>>['downloadLinks']
-> = {
+// Pretty URLs from README / docs (e.g. /download/mac-arm) are kept for
+// compatibility, but we now always route through the /download page so users
+// see context + a donate prompt + resources while the download kicks off.
+// The page handles the actual file trigger itself — no more silent redirects
+// to GitHub or direct asset URLs.
+const PLATFORM_ALIAS: Record<string, string> = {
   'mac-arm': 'macArm',
   'mac-intel': 'macIntel',
   windows: 'windows',
@@ -14,29 +15,12 @@ const PLATFORM_MAP: Record<
 };
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ platform: string }> },
 ) {
   const { platform } = await params;
-  const key = PLATFORM_MAP[platform];
-
-  if (!key) {
-    return NextResponse.json(
-      { error: `Unknown platform: ${platform}. Use: ${Object.keys(PLATFORM_MAP).join(', ')}` },
-      { status: 404 },
-    );
-  }
-
-  try {
-    const release = await getLatestRelease();
-    const url = release.downloadLinks[key];
-
-    if (!url) {
-      return NextResponse.json({ error: `No download available for ${platform}` }, { status: 404 });
-    }
-
-    return NextResponse.redirect(url);
-  } catch {
-    return NextResponse.redirect(`https://github.com/jamiepine/voicebox/releases/latest`);
-  }
+  const normalized = PLATFORM_ALIAS[platform];
+  const target = new URL('/download', request.url);
+  if (normalized) target.searchParams.set('platform', normalized);
+  return NextResponse.redirect(target, 307);
 }
