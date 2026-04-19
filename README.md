@@ -255,6 +255,8 @@ Full API documentation available at `http://localhost:17493/docs`.
 | **Plugin Architecture** | Extend with custom models and effects          |
 | **Mobile Companion**    | Control Voicebox from your phone               |
 
+For the **full engineering status, open-issue triage, and prioritized work queue**, see [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md) — a living document that tracks what's shipped, what's in-flight, candidate TTS engines under evaluation, and why we've accepted or backlogged specific integrations.
+
 ---
 
 ## Development
