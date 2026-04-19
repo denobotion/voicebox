@@ -30,7 +30,7 @@ const CURL_SNIPPET = `curl -X POST http://127.0.0.1:17493/generate \\
   -d '{
     "text": "Welcome to the game, player one.",
     "profile_id": "morgan-freeman",
-    "engine": "qwen",
+    "engine": "qwen_custom_voice",
     "instruct": "warm, slow, cinematic"
   }' \\
   --output line.wav`;
