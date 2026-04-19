@@ -27,7 +27,7 @@ jobs:
             python-version: "3.12"
             backend: "pytorch"
           - platform: "ubuntu-22.04"
-            args: "--target x86_64-unknown-linux-gnu --bundles deb,rpm"
+            args: "--target x86_64-unknown-linux-gnu --bundles deb,rpm --verbose"
             python-version: "3.12"
             backend: "pytorch"
 
@@ -153,6 +153,21 @@ jobs:
           p12-file-base64: ${{ secrets.APPLE_CERTIFICATE }}
           p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
 
+      - name: Disk / environment snapshot (pre-bundle debug)
+        if: contains(matrix.platform, 'ubuntu') || contains(matrix.platform, 'namespace')
+        run: |
+          echo "=== df -h ==="
+          df -h
+          echo "=== free -h ==="
+          free -h
+          echo "=== Rust / Cargo ==="
+          rustc --version
+          cargo --version
+          echo "=== Bun ==="
+          bun --version
+          echo "=== Tauri CLI ==="
+          cd tauri && bun run tauri --version
+
       - name: Extract release notes from CHANGELOG.md
         id: changelog
         shell: bash
@@ -176,7 +191,13 @@ jobs:
             echo "CHANGELOG_EOF"
           } >> "$GITHUB_OUTPUT"
 
+      # Linux hang watchdog: previous releases silently wedged inside tauri
+      # bundling (possibly linuxdeploy/AppImage download, possibly cargo link).
+      # Cap the step at 30 min so we get logs instead of waiting out the 6hr
+      # job timeout. Other platforms historically complete in ~25 min, so 45
+      # is comfortable.
       - uses: tauri-apps/tauri-action@v0.6
+        timeout-minutes: ${{ (contains(matrix.platform, 'ubuntu') || contains(matrix.platform, 'namespace')) && 30 || 45 }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
@@ -188,6 +209,9 @@ jobs:
           APPLE_PROVIDER_SHORT_NAME: ${{ secrets.APPLE_PROVIDER_SHORT_NAME }}
           APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
           APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+          # Stream subprocess stdout/stderr so the hang is visible in logs.
+          CARGO_TERM_VERBOSE: "true"
+          RUST_BACKTRACE: "1"
         with:
           projectPath: tauri
           tagName: v__VERSION__
