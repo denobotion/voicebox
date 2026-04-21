@@ -50,5 +50,6 @@
     "npm": "10.4.0"
   },
   "_comment": "Personal fork for learning Electron + React. Upstream: https://github.com/jamiepine/voicebox",
-  "_notes": "TODO: explore adding Azure Cognitive Services TTS engine as a third provider option"
+  "_notes": "TODO: explore adding Azure Cognitive Services TTS engine as a third provider option",
+  "_learning_log": "2024-03-01: figured out how IPC works between main/renderer; 2024-03-08: studied electron-vite config and how renderer env vars are injected"
 }
