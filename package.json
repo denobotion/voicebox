@@ -49,5 +49,6 @@
     "node": "20.11.0",
     "npm": "10.4.0"
   },
-  "_comment": "Personal fork for learning Electron + React. Upstream: https://github.com/jamiepine/voicebox"
+  "_comment": "Personal fork for learning Electron + React. Upstream: https://github.com/jamiepine/voicebox",
+  "_notes": "TODO: explore adding Azure Cognitive Services TTS engine as a third provider option"
 }
