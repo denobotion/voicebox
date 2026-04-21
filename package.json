@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "package": "electron-builder",
     "release": "electron-builder --publish always"
   },
@@ -30,6 +31,7 @@
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
     "@vitejs/plugin-react": "^4.2.1",
+    "@vitest/coverage-v8": "^1.2.1",
     "electron": "^29.0.0",
     "electron-builder": "^24.9.1",
     "electron-vite": "^2.0.0",
